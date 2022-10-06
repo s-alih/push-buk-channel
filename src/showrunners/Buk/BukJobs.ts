@@ -20,36 +20,24 @@ import config from '../../config';
 import logger from '../../loaders/logger';
 import { Container } from 'typedi';
 import schedule from 'node-schedule';
-import QiDaoChannel from './BukChannel';
+import BukChannel from './BukChannel';
 
 export default () => {
   const startTime = new Date(new Date().setHours(0, 0, 0, 0));
   const threeHourRule = new schedule.RecurrenceRule();
   threeHourRule.hour = new schedule.Range(0, 23, 3);
-  const channel = Container.get(QiDaoChannel);
+  const channel = Container.get(BukChannel);
   threeHourRule.minute = 0;
-  const dailyRule = new schedule.RecurrenceRule();
-  dailyRule.hour = 0;
-  dailyRule.minute = 0;
-  dailyRule.second = 0;
-  dailyRule.dayOfWeek = new schedule.Range(0, 6);
+
+  const tenMinuteRule = new schedule.RecurrenceRule();
+  tenMinuteRule.minute = new schedule.Range(0, 59, 10);
 
   channel.logInfo(`     🛵 Scheduling Showrunner  [on 24 hours] `);
 
-  schedule.scheduleJob({ start: startTime, rule: dailyRule }, async function () {
-    const taskName = `${channel.cSettings.name} liquidationTask`;
+  schedule.scheduleJob({ start: startTime, rule: tenMinuteRule }, async function () {
+    const taskName = `${channel.cSettings.name} booking notifications`;
     try {
-      channel.sendLiquidationNotifis(false);
-      channel.logInfo(`🐣 Cron Task Completed -- ${taskName}`);
-    } catch (err) {
-      logger.error(`[${new Date(Date.now())}] ❌ Cron Task Failed -- ${taskName}`);
-      logger.error(`[${new Date(Date.now())}] Error Object: %o`, err);
-    }
-  });
-  schedule.scheduleJob({ start: startTime, rule: dailyRule }, async function () {
-    const taskName = `${channel.cSettings.name} liquidationTask`;
-    try {
-      channel.sendHealthFactorNotifs(false);
+      channel.sendBookingNotifications(false);
       channel.logInfo(`🐣 Cron Task Completed -- ${taskName}`);
     } catch (err) {
       logger.error(`[${new Date(Date.now())}] ❌ Cron Task Failed -- ${taskName}`);
@@ -57,9 +45,19 @@ export default () => {
     }
   });
   schedule.scheduleJob({ start: startTime, rule: threeHourRule }, async function () {
-    const taskName = `${channel.cSettings.name} snapShotProposalsTask(false)`;
+    const taskName = `${channel.cSettings.name} precheckIn reminder`;
     try {
-      channel.snapShotProposalsTask(false);
+      channel.sendPrecheckInReminder(false);
+      channel.logInfo(`🐣 Cron Task Completed -- ${taskName}`);
+    } catch (err) {
+      logger.error(`[${new Date(Date.now())}] ❌ Cron Task Failed -- ${taskName}`);
+      logger.error(`[${new Date(Date.now())}] Error Object: %o`, err);
+    }
+  });
+  schedule.scheduleJob({ start: startTime, rule: threeHourRule }, async function () {
+    const taskName = `${channel.cSettings.name} sendCancelBookingNotification`;
+    try {
+      channel.sendCancelBookingNotification(false);
       logger.info(`🐣 Cron Task Completed -- ${taskName}`);
     } catch (err) {
       logger.error(`❌ Cron Task Failed -- ${taskName}`);
@@ -68,9 +66,20 @@ export default () => {
   });
   channel.logInfo(`-- 🛵 Scheduling Showrunner ${channel.cSettings.name} -  Channel [on 3hr ]`);
   schedule.scheduleJob({ start: startTime, rule: threeHourRule }, async function () {
-    const taskName = `${channel.cSettings.name} snapShotEndingProposalsTask(false)`;
+    const taskName = `${channel.cSettings.name} sendCheckoutNotifs`;
     try {
-      channel.snapShotEndedProposalsTask(false);
+      channel.sendCheckoutNotifs(false);
+      logger.info(`🐣 Cron Task Completed -- ${taskName}`);
+    } catch (err) {
+      logger.error(`❌ Cron Task Failed -- ${taskName}`);
+      logger.error(`Error Object: %o`, err);
+    }
+  });
+  channel.logInfo(`-- 🛵 Scheduling Showrunner ${channel.cSettings.name} -  Channel [on 3hr ]`);
+  schedule.scheduleJob({ start: startTime, rule: tenMinuteRule }, async function () {
+    const taskName = `${channel.cSettings.name} sendListingNotifs`;
+    try {
+      channel.sendListingNotifs(false);
       logger.info(`🐣 Cron Task Completed -- ${taskName}`);
     } catch (err) {
       logger.error(`❌ Cron Task Failed -- ${taskName}`);
@@ -79,9 +88,9 @@ export default () => {
   });
   channel.logInfo(`-- 🛵 Scheduling Showrunner ${channel.cSettings.name} -  Channel [on 3hr ]`);
   schedule.scheduleJob({ start: startTime, rule: threeHourRule }, async function () {
-    const taskName = `${channel.cSettings.name} snapShotActiveProposalsTask(false)`;
+    const taskName = `${channel.cSettings.name} sendListingSoldNotifs`;
     try {
-      channel.snapShotConcludingProposalsTask(false);
+      channel.sendListingSoldNotifs(false);
       logger.info(`🐣 Cron Task Completed -- ${taskName}`);
     } catch (err) {
       logger.error(`❌ Cron Task Failed -- ${taskName}`);

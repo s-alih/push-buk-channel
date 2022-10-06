@@ -28,7 +28,7 @@ export default class BukChannel extends EPNSChannel {
 
     // getting subscribers to the channel
 
-    const subscribers = simulate.logicOverride.mode
+    const subscribers = simulate.logicOverride?.mode
       ? simulate.logicOverride.subscriber
       : await this.getChannelSubscribers();
 
@@ -99,7 +99,7 @@ export default class BukChannel extends EPNSChannel {
     this.logInfo(`send precheck in alert`);
 
     // getting subscribers to the channel
-    const subscribers = simulate.logicOverride.mode
+    const subscribers = simulate.logicOverride?.mode
       ? simulate.logicOverride.subscriber
       : await this.getChannelSubscribers();
     console.log(subscribers);
@@ -121,7 +121,7 @@ export default class BukChannel extends EPNSChannel {
         let owners = await this.getOwnerOfNFT(user.id);
         console.log('NFT users', owners);
 
-        if (this.timestamp < checkInTime - checkInWindow) {
+        if (this.timestamp > checkInTime - checkInWindow) {
           for (let owner of owners) {
             console.log('owner', owner);
             if (subscribers.includes(owner)) {
@@ -130,7 +130,7 @@ export default class BukChannel extends EPNSChannel {
               const payloadMsg = `Check in window is open for your hotel booking, please check in!`;
 
               await this.sendNotification({
-                recipient: simulate.txOverride.mode ? this.channelAddress : owner,
+                recipient: simulate.txOverride?.mode ? this.channelAddress : owner,
                 image: null,
                 message: payloadMsg,
                 payloadMsg: payloadMsg,
@@ -156,8 +156,8 @@ export default class BukChannel extends EPNSChannel {
 
     // getting subscribers to the channel
 
-    const subscribers = simulate.logicOverride.mode
-      ? simulate.logicOverride?.subscriber
+    const subscribers = simulate.logicOverride?.mode
+      ? simulate.logicOverride.subscriber
       : await this.getChannelSubscribers();
 
     const buk = await this.getContract(this.BUK_CONTRACT_ADDRESS, JSON.stringify(bukABI));
@@ -257,7 +257,7 @@ export default class BukChannel extends EPNSChannel {
         if (subscribers.includes(args.seller.toLowerCase())) {
           console.log('condition satisfied');
           await this.sendNotification({
-            recipient: simulate.txOverride.mode ? this.channelAddress : args.seller.toLowerCase(),
+            recipient: simulate.txOverride?.mode ? this.channelAddress : args.seller.toLowerCase(),
             image: null,
             message: payloadMsg,
             payloadMsg: payloadMsg,
@@ -279,7 +279,7 @@ export default class BukChannel extends EPNSChannel {
     this.logInfo(`send checkout notification`);
 
     // getting subscribers to the channel
-    const subscribers = simulate.logicOverride.mode
+    const subscribers = simulate.logicOverride?.mode
       ? simulate.logicOverride.subscriber
       : await this.getChannelSubscribers();
 
@@ -317,7 +317,7 @@ export default class BukChannel extends EPNSChannel {
         if (subscribers.includes(args.user.toLowerCase())) {
           console.log('condition satisfied');
           await this.sendNotification({
-            recipient: simulate.txOverride.mode ? this.channelAddress : args.user.toLowerCase(),
+            recipient: simulate.txOverride?.mode ? this.channelAddress : args.user.toLowerCase(),
             image: null,
             message: payloadMsg,
             payloadMsg: payloadMsg,
@@ -339,7 +339,7 @@ export default class BukChannel extends EPNSChannel {
     this.logInfo(`send listing sold notification`);
 
     // getting subscribers to the channel
-    const subscribers = simulate.logicOverride.mode
+    const subscribers = simulate.logicOverride?.mode
       ? simulate.logicOverride.subscriber
       : await this.getChannelSubscribers();
 
@@ -382,7 +382,7 @@ export default class BukChannel extends EPNSChannel {
           if (subscribers.includes(userData.address)) {
             console.log('condition satisfied');
             await this.sendNotification({
-              recipient: simulate.txOverride.mode ? this.channelAddress : userData.address,
+              recipient: simulate.txOverride?.mode ? this.channelAddress : userData.address,
               image: null,
               message: payloadMsg,
               payloadMsg: payloadMsg,
